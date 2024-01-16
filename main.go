@@ -46,7 +46,7 @@ func parsecrl(file string) {
 			fmt.Println("Next Update: ", cert.NextUpdate)
 			//fmt.Println(cert.RevokedCertificateEntries)
 			for i := 0; i < len(cert.RevokedCertificateEntries); i++ {
-				fmt.Println("SerialNum: ", string[cert.RevokedCertificateEntries[i].SerialNumber])
+				fmt.Println("SerialNum: ", cert.RevokedCertificateEntries[i].SerialNumber)
 				fmt.Println("RevocationTime: ", cert.RevokedCertificateEntries[i].RevocationTime)
 			}
 		} else {

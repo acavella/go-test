@@ -5,6 +5,7 @@ import (
 	"crypto/x509/pkix"
 	"database/sql"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
@@ -29,11 +30,20 @@ func main() {
 	parsecrl(crlfile)
 	sqliteDatabase, _ := sql.Open("sqlite3", dbfile) //https://www.codeproject.com/Articles/5261771/Golang-SQLite-Simple-Example
 	defer sqliteDatabase.Close()
+	insertCertificate(sqliteDatabase, 0, "text", 0)
 
 }
 
-func insertCertificate(serial *big.Int revocationtime time.Time reasoncode int) {
-	insertCertificateSQL := sql.DB.Exec("INSERT INTO table-name VALUES(NULL,NULL,NULL,?,?,?);", revocationtime, serial, reasoncode)
+func insertCertificate(db *sql.DB, serial int, revocationtime string, reasoncode int) {
+	insertCertificateSQL := `INSERT INTO table-name(revocationtime,serial,reasoncode) VALUES (NULL,NULL,NULL,?,?,?)`
+	statement, err := db.Prepare(insertCertificateSQL)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	_, err = statement.Exec(revocationtime, serial, reasoncode)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
 
 func parsecrl(file string) {

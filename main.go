@@ -32,7 +32,9 @@ func main() {
 
 }
 
-func insertCertificate(db *sql.DB, serial string) {}
+func insertCertificate(serial *big.Int revocationtime time.Time reasoncode int) {
+	insertCertificateSQL := sql.DB.Exec("INSERT INTO table-name VALUES(NULL,NULL,NULL,?,?,?);", revocationtime, serial, reasoncode)
+}
 
 func parsecrl(file string) {
 	crl, err := os.ReadFile(file)

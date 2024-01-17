@@ -27,15 +27,16 @@ type RevocationListEntry struct {
 }
 
 func main() {
-	parsecrl(crlfile)
 	sqliteDatabase, _ := sql.Open("sqlite3", dbfile) //https://www.codeproject.com/Articles/5261771/Golang-SQLite-Simple-Example
 	defer sqliteDatabase.Close()
-	insertCertificate(sqliteDatabase, 0, "text", 0)
+	parsecrl(sqliteDatabase, crlfile)
+
+	//insertCertificate(sqliteDatabase, "test", "test", "test")
 
 }
 
-func insertCertificate(db *sql.DB, serial int, revocationtime string, reasoncode int) {
-	insertCertificateSQL := `INSERT INTO table-name(revocationtime,serial,reasoncode) VALUES (NULL,NULL,NULL,?,?,?)`
+func insertCertificate(db *sql.DB, revocationtime string, serial string, reasoncode string) {
+	insertCertificateSQL := `INSERT INTO certificates(revtime,serial,reason) VALUES (?,?,?)`
 	statement, err := db.Prepare(insertCertificateSQL)
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -46,8 +47,9 @@ func insertCertificate(db *sql.DB, serial int, revocationtime string, reasoncode
 	}
 }
 
-func parsecrl(file string) {
+func parsecrl(sqliteDatabase *sql.DB, file string) {
 	crl, err := os.ReadFile(file)
+
 	if err != nil {
 		fmt.Print(err)
 	} else {
@@ -60,6 +62,8 @@ func parsecrl(file string) {
 			for i := 0; i < len(cert.RevokedCertificateEntries); i++ {
 				fmt.Println("SerialNum: ", cert.RevokedCertificateEntries[i].SerialNumber)
 				fmt.Println("RevocationTime: ", cert.RevokedCertificateEntries[i].RevocationTime)
+
+				insertCertificate(sqliteDatabase, "test", cert.RevokedCertificateEntries[i].SerialNumber.String(), "test")
 			}
 		} else {
 			fmt.Print(err)
